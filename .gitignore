@@ -1,3 +1,4 @@
 dados.db
 *.sqbpro
 venv/
+__pycache__/
