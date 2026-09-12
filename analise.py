@@ -12,6 +12,7 @@ conexao.close()
 
 df_rfm['R_score'] = pd.qcut(df_rfm['days_last_purchase'], 5, labels=[5, 4, 3, 2, 1])
 
+# utilizando cut pelo erro no cálculo dos limites que deram o mesmo valor (maioria das compras tinha total 1)
 df_rfm['F_score'] = pd.cut(df_rfm['total_purchases'], bins=[0, 3, 6, 15], labels=[1, 3, 5])
 
 df_rfm['M_score'] = pd.qcut(df_rfm['total_price_per_client'], 5, labels=[1, 2, 3, 4, 5])
