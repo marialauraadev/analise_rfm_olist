@@ -11,6 +11,7 @@ df_rfm = pd.read_sql_query(query, conexao)
 
 conexao.close()
 
+# transformando R score para int por conta da ordem de posição lista de labels (pandas entendendo que 5 seria a categoria mais baixa e 1 a mais alta)
 df_rfm['R_score'] = pd.qcut(df_rfm['days_last_purchase'], 5, labels=[5, 4, 3, 2, 1])
 df_rfm['R_score'] = df_rfm['R_score'].astype('int')
 
@@ -28,9 +29,9 @@ df_rfm['RFM_score'] = df_rfm['R_score_str'] + df_rfm['F_score_str'] + df_rfm['M_
 
 agrupamentos = [
     (df_rfm['R_score'] >= 4) & (df_rfm['F_score'] == 5) & (df_rfm['M_score'] >= 4),
-    (df_rfm['R_score'] >= 1) & (df_rfm['R_score'] <= 3) & (df_rfm['F_score'] == 5) & (df_rfm['M_score'] >= 4),
+    (df_rfm['R_score'] >= 1) & (df_rfm['R_score'] <= 3) & (df_rfm['F_score'] >= 3) & (df_rfm['M_score'] >= 4),
     (df_rfm['R_score'] >= 4) & (df_rfm['F_score'] == 3) & (df_rfm['M_score'] >= 3),
-    (df_rfm['R_score'] >= 4) & (df_rfm['F_score'] == 1)
+    (df_rfm['R_score'] >= 4) & (df_rfm['F_score'] == 1),
     (df_rfm['R_score'] >= 1) & (df_rfm['R_score'] <= 3) & (df_rfm['F_score'] == 1)
 ]
 
