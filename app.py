@@ -380,7 +380,7 @@ with aba_ia:
                             input=f"Contexto da análise:\n{resumo_para_ia(df_rfm)}\n\nPergunta: {pergunta}",
                         )
                         st.session_state['perguntas_ia'] = perguntas_usadas + 1
-                        st.markdown(resposta.output_text)
+                        st.markdown(resposta.output_text.replace('$', '\\$'))
                     # tratando o estouro de cota separado pra nao aparecer erro pra quem ta visitando
                     except Exception as erro:
                         if 'RESOURCE_EXHAUSTED' in str(erro) or '429' in str(erro):
@@ -390,4 +390,4 @@ with aba_ia:
                             st.error("Não foi possível obter a resposta agora. Tente novamente em instantes.")
                             print(f"erro na chamada do gemini: {erro}")
 
-        st.caption(f"Perguntas nesta sessão: {perguntas_usadas}/{limite_perguntas}")
+        st.caption(f"Perguntas nesta sessão: {st.session_state.get('perguntas_ia', 0)}/{limite_perguntas}")
