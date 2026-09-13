@@ -210,7 +210,7 @@ aba_visao_geral, aba_segmentos, aba_explorar, aba_ia = st.tabs(
 
 with aba_visao_geral:
     st.subheader("Distribuição de Clientes por Segmento")
-    st.caption("Quantidade de clientes em cada grupo: inativos, novos clientes, clientes leais, clientes em risco, campeões e limbo")
+    st.caption("Quantidade de clientes em cada grupo: inativos, novos clientes, clientes leais, clientes em risco, campeões e limbo. A escala logarítmica facilita a visualização dos grupos menores.")
 
     contagem = df_rfm['segmento'].value_counts().reindex(segmentos_presentes).reset_index()
     contagem.columns = ['segmento', 'clientes']
