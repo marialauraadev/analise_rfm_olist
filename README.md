@@ -2,7 +2,7 @@
 
 Segmentação de clientes de um e-commerce brasileiro usando a metodologia RFM (Recência, Frequência, Monetário), do modelo do banco de dados até um dashboard interativo publicado.
 
-🔗 **[Acessar o dashboard](#)** · 🗂️ Dataset: [Olist Brazilian E-Commerce](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
+🔗 **[Acessar o dashboard](https://segmentacaorfmolist.streamlit.app/)** · 🗂️ Dataset: [Olist Brazilian E-Commerce](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)
 
 ---
 
