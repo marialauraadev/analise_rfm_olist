@@ -2,3 +2,4 @@ dados.db
 *.sqbpro
 venv/
 __pycache__/
+.streamlit/secrets.toml
