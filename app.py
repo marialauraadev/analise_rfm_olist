@@ -14,8 +14,10 @@ st.set_page_config(page_title="Análise RFM", page_icon="📊", layout="wide")
 cor_segmento = {
     'Campeões': '#3987e5',
     'Clientes Leais': '#199e70',
+    'Novos Clientes - Alto Valor': '#6b5bd6',
     'Novos Clientes': '#9085e9',
     'Clientes em Risco': '#d95926',
+    'Clientes Inativos - Alto Valor': '#c73e3e',
     'Clientes Inativos': '#e66767',
     'Limbo': '#898781',
 }
@@ -133,8 +135,10 @@ REGRAS DE SEGMENTAÇÃO
 - Campeões: R>=4 e F=5 e M>=4
 - Clientes em Risco: R entre 1 e 3, F>=3 e M>=4
 - Clientes Leais: R>=4, F=3 e M>=3
-- Novos Clientes: R>=4 e F=1
-- Clientes Inativos: R entre 1 e 3 e F=1
+- Novos Clientes - Alto Valor: R>=4, F=1 e M>=4
+- Novos Clientes: R>=4, F=1 e M<=3
+- Clientes Inativos - Alto Valor: R entre 1 e 3, F=1 e M>=4
+- Clientes Inativos: R entre 1 e 3, F=1 e M<=3
 - Limbo: não se encaixa em nenhuma regra acima
 """
 
