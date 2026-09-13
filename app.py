@@ -179,7 +179,7 @@ col1, col2, col3, col4 = st.columns(4)
 col1.metric("Total de Clientes", f"{df_rfm['customer_unique_id'].nunique():,}")
 col2.metric("Receita Total", f"R$ {receita_total/1_000_000:,.2f} mi")
 col3.metric("Ticket Médio", f"R$ {df_rfm['total_price_per_client'].mean():,.2f}")
-col4.metric("Compraram uma só vez", f"{compra_unica:.1f}%")
+col4.metric("Compraram uma só vez", f"{compra_unica:.2f}%")
 
 st.markdown("")
 st.markdown("**Concentração de receita por segmento**")
@@ -196,7 +196,7 @@ for posicao, (segmento, valor) in enumerate(receita_segmento.head(3).items()):
     colunas_receita[posicao].markdown(
         f"""<div class="cartao-segmento" style="--cor-segmento: {cor_segmento[segmento]}">
             <div class="rotulo">{posicao + 1}º · {segmento}</div>
-            <div class="valor">{percentual:.1f}%</div>
+            <div class="valor">{percentual:.2f}%</div>
             <div class="detalhe">R$ {valor:,.0f} da receita</div>
         </div>""",
         unsafe_allow_html=True,
@@ -223,7 +223,7 @@ with aba_visao_geral:
         y=contagem['segmento'],
         orientation='h',
         marker_color=[cor_segmento[s] for s in contagem['segmento']],
-        text=[f"{c:,} ({p:.1f}%)" for c, p in zip(contagem['clientes'], contagem['percentual'])],
+        text=[f"{c:,} ({p:.2f}%)" for c, p in zip(contagem['clientes'], contagem['percentual'])],
         textposition='outside',
         hovertemplate='<b>%{y}</b><br>%{x:,} clientes<extra></extra>',
     ))
