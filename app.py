@@ -156,9 +156,12 @@ def layout_padrao(fig, altura=420):
         paper_bgcolor='rgba(0,0,0,0)',
         font_color=texto_secundario,
         legend_title_text='Segmento',
+        dragmode=False,
     )
-    fig.update_xaxes(gridcolor=grade, zeroline=False)
-    fig.update_yaxes(gridcolor=grade, zeroline=False)
+    # travando o zoom porque no celular arrastar o dedo em cima do grafico dava zoom em vez de rolar a pagina
+    fig.update_xaxes(gridcolor=grade, zeroline=False, fixedrange=True)
+    fig.update_yaxes(gridcolor=grade, zeroline=False, fixedrange=True)
+    fig.update_traces(cliponaxis=False)
     return fig
 
 
@@ -228,7 +231,7 @@ with aba_visao_geral:
     fig_dist.update_xaxes(title='Clientes (escala logarítmica)', type='log')
     fig_dist.update_yaxes(title='')
     layout_padrao(fig_dist, altura=380)
-    st.plotly_chart(fig_dist, width='stretch')
+    st.plotly_chart(fig_dist, width='stretch', config={'displayModeBar': False})
 
     st.subheader("Distribuição de Frequência de Compras")
     st.caption("Quantidade de clientes por número total de compras realizadas")
@@ -251,7 +254,7 @@ with aba_visao_geral:
     fig_freq.update_yaxes(title='Clientes', type='log')
     fig_freq.update_xaxes(title='')
     layout_padrao(fig_freq, altura=380)
-    st.plotly_chart(fig_freq, width='stretch')
+    st.plotly_chart(fig_freq, width='stretch', config={'displayModeBar': False})
 
 with aba_segmentos:
     st.subheader("Comparação Personalizada de Segmentos")
@@ -285,18 +288,20 @@ with aba_segmentos:
 
         fig_comparacao = go.Figure()
         fig_comparacao.add_trace(go.Bar(
-            x=comparacao.index,
-            y=comparacao.values,
+            x=comparacao.values,
+            y=comparacao.index,
+            orientation='h',
             # a cor segue o segmento e nao a posicao, senao o grafico se repinta toda vez que filtra
             marker_color=[cor_segmento[s] for s in comparacao.index],
             text=[formato.format(v) for v in comparacao.values],
             textposition='outside',
-            hovertemplate='<b>%{x}</b><br>' + metrica + ': %{y:,.2f}<extra></extra>',
+            hovertemplate='<b>%{y}</b><br>' + metrica + ': %{x:,.2f}<extra></extra>',
         ))
-        fig_comparacao.update_yaxes(title=titulo_eixo)
-        fig_comparacao.update_xaxes(title='')
+        # barra deitada pro nome do segmento caber no celular, e autorange invertido pro primeiro ficar em cima
+        fig_comparacao.update_yaxes(title='', autorange='reversed')
+        fig_comparacao.update_xaxes(title=titulo_eixo)
         layout_padrao(fig_comparacao, altura=420)
-        st.plotly_chart(fig_comparacao, width='stretch')
+        st.plotly_chart(fig_comparacao, width='stretch', config={'displayModeBar': False})
 
         st.subheader("Comparação Geral de Segmentos")
 
