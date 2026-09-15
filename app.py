@@ -1,5 +1,6 @@
 import streamlit as st
 import plotly.graph_objects as go
+import math
 import os
 import sys
 sys.path.append('src')
@@ -76,6 +77,56 @@ st.markdown("""
     .cartao-segmento .detalhe {
         font-size: 0.85rem;
         color: #c3c2b7;
+    }
+
+    @media (max-width: 640px) {
+        .block-container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: 2.5rem;
+        }
+        h1 {
+            font-size: 1.6rem !important;
+        }
+        .st-key-cartoes-kpi div[data-testid="stHorizontalBlock"],
+        .st-key-cartoes-receita div[data-testid="stHorizontalBlock"] {
+            row-gap: 1.75rem !important;
+        }
+        .st-key-cartoes-kpi div[data-testid="stColumn"],
+        .st-key-cartoes-receita div[data-testid="stColumn"] {
+            flex: 1 1 calc(50% - 0.5rem) !important;
+            min-width: calc(50% - 0.5rem) !important;
+            width: calc(50% - 0.5rem) !important;
+        }
+        div[data-testid="stMetric"] {
+            padding: 12px 12px;
+        }
+        div[data-testid="stMetricLabel"] p {
+            font-size: 0.68rem;
+        }
+        div[data-testid="stMetricValue"] {
+            font-size: 1.2rem;
+        }
+        .cartao-segmento {
+            padding: 12px;
+        }
+        .cartao-segmento .rotulo {
+            font-size: 0.65rem;
+        }
+        .cartao-segmento .valor {
+            font-size: 1.2rem;
+        }
+        .cartao-segmento .detalhe {
+            font-size: 0.72rem;
+        }
+        /* as quatro abas nao cabem na largura do celular sem diminuir o texto */
+        div[data-testid="stTabs"] button[data-baseweb="tab"] {
+            padding-left: 6px;
+            padding-right: 6px;
+        }
+        div[data-testid="stTabs"] button[data-baseweb="tab"] p {
+            font-size: 0.8rem;
+        }
     }
     </style>
 """, unsafe_allow_html=True)
@@ -159,6 +210,7 @@ def layout_padrao(fig, altura=420):
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font_color=texto_secundario,
+        font_size=12,
         legend_title_text='Segmento',
         dragmode=False,
     )
@@ -167,6 +219,15 @@ def layout_padrao(fig, altura=420):
     fig.update_yaxes(gridcolor=grade, zeroline=False, fixedrange=True)
     fig.update_traces(cliponaxis=False)
     return fig
+
+
+# nome de segmento com " - Alto Valor" ocupa metade da largura da tela no celular, entao quebro em duas linhas
+def quebra_rotulo(nome):
+    return nome.replace(' - ', '<br>')
+
+
+def rotulos_do_eixo(nomes):
+    return dict(tickmode='array', tickvals=list(nomes), ticktext=[quebra_rotulo(n) for n in nomes], automargin=True)
 
 
 df_rfm = carregar_dados()
@@ -179,7 +240,7 @@ receita_total = df_rfm['total_price_per_client'].sum()
 # esse numero é o mais chamativo da base, quase todo mundo comprou uma vez so
 compra_unica = (df_rfm['total_purchases'] == 1).mean() * 100
 
-col1, col2, col3, col4 = st.columns(4)
+col1, col2, col3, col4 = st.container(key='cartoes-kpi').columns(4)
 col1.metric("Total de Clientes", f"{df_rfm['customer_unique_id'].nunique():,}")
 col2.metric("Receita Total", f"R$ {receita_total/1_000_000:,.2f} mi")
 col3.metric("Ticket Médio", f"R$ {df_rfm['total_price_per_client'].mean():,.2f}")
@@ -193,7 +254,7 @@ receita_segmento = (
     df_rfm.groupby('segmento')['total_price_per_client'].sum().sort_values(ascending=False)
 )
 
-colunas_receita = st.columns(3)
+colunas_receita = st.container(key='cartoes-receita').columns(3)
 
 for posicao, (segmento, valor) in enumerate(receita_segmento.head(3).items()):
     percentual = valor / receita_total * 100
@@ -228,12 +289,19 @@ with aba_visao_geral:
         orientation='h',
         marker_color=[cor_segmento[s] for s in contagem['segmento']],
         text=[f"{c:,} ({p:.2f}%)" for c, p in zip(contagem['clientes'], contagem['percentual'])],
-        textposition='outside',
+        # 'auto' joga o rotulo pra dentro quando a barra é grande
+        textposition='auto',
+        insidetextfont=dict(color='#ffffff'),
+        outsidetextfont=dict(color=texto_secundario),
         hovertemplate='<b>%{y}</b><br>%{x:,} clientes<extra></extra>',
     ))
-    # escala log porque inativos e novos clientes sao tao grandes que sumiam com os outros segmentos
-    fig_dist.update_xaxes(title='Clientes (escala logarítmica)', type='log')
-    fig_dist.update_yaxes(title='')
+    # escala log porque inativos e novos clientes sumiam com os outros segmentos (nao trocar)
+    fig_dist.update_xaxes(
+        title='Clientes (escala logarítmica)',
+        type='log',
+        range=[0, math.log10(contagem['clientes'].max()) + 0.45],
+    )
+    fig_dist.update_yaxes(title='', **rotulos_do_eixo(contagem['segmento']))
     layout_padrao(fig_dist, altura=380)
     st.plotly_chart(fig_dist, width='stretch', config={'displayModeBar': False})
 
@@ -252,10 +320,16 @@ with aba_visao_geral:
         y=contagem_compras.values,
         marker_color=cor_segmento['Campeões'],
         text=[f"{v:,}" for v in contagem_compras.values],
-        textposition='outside',
+        textposition='auto',
+        insidetextfont=dict(color='#ffffff'),
+        outsidetextfont=dict(color=texto_secundario),
         hovertemplate='<b>%{x}</b><br>%{y:,} clientes<extra></extra>',
     ))
-    fig_freq.update_yaxes(title='Clientes', type='log')
+    fig_freq.update_yaxes(
+        title='Clientes',
+        type='log',
+        range=[0, math.log10(contagem_compras.max()) + 0.35],
+    )
     fig_freq.update_xaxes(title='')
     layout_padrao(fig_freq, altura=380)
     st.plotly_chart(fig_freq, width='stretch', config={'displayModeBar': False})
@@ -298,12 +372,14 @@ with aba_segmentos:
             # a cor segue o segmento e nao a posicao, senao o grafico se repinta toda vez que filtra
             marker_color=[cor_segmento[s] for s in comparacao.index],
             text=[formato.format(v) for v in comparacao.values],
-            textposition='outside',
+            textposition='auto',
+            insidetextfont=dict(color='#ffffff'),
+            outsidetextfont=dict(color=texto_secundario),
             hovertemplate='<b>%{y}</b><br>' + metrica + ': %{x:,.2f}<extra></extra>',
         ))
         # barra deitada pro nome do segmento caber no celular, e autorange invertido pro primeiro ficar em cima
-        fig_comparacao.update_yaxes(title='', autorange='reversed')
-        fig_comparacao.update_xaxes(title=titulo_eixo)
+        fig_comparacao.update_yaxes(title='', autorange='reversed', **rotulos_do_eixo(comparacao.index))
+        fig_comparacao.update_xaxes(title=titulo_eixo, range=[0, comparacao.max() * 1.25])
         layout_padrao(fig_comparacao, altura=420)
         st.plotly_chart(fig_comparacao, width='stretch', config={'displayModeBar': False})
 
