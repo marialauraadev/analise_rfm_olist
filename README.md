@@ -109,7 +109,7 @@ A query final ([`sql/analise_rfm.sql`](sql/analise_rfm.sql)) segue esta lógica:
 
 ### Validação da query
 
-Antes de confiar no resultado, a query foi validada em três frentes:
+Antes de confiar no resultado, a query foi validada em três frentes (validação na pasta `sql/validacao`):
 
 1. Teste pontual: um cliente com poucos pedidos, conferido manualmente linha por linha
 2. Teste de estresse: um cliente com 15 pedidos (o maior volume da base), para garantir que o JOIN não duplicava linhas em escala
@@ -191,24 +191,6 @@ Este projeto fez escolhas conscientes de escopo, documentadas aqui para transpar
 - **Matplotlib / Plotly**: visualização
 - **Streamlit**: dashboard interativo publicado
 - **Google Gemini API**: assistente de perguntas em linguagem natural dentro do dashboard
-
-## Como rodar o projeto
-
-```bash
-# Clonar o repositório
-git clone https://github.com/marialauraadev/analise_rfm_olist.git
-cd analise_rfm_olist
-
-# Criar e ativar o ambiente virtual
-python -m venv venv
-source venv/Scripts/activate  # Windows (Git Bash)
-
-# Instalar dependências
-pip install -r requirements.txt
-
-# Rodar o dashboard
-streamlit run app.py
-```
 
 O banco de dados (`dados.db`) já está incluído no repositório. Para recriá-lo do zero a partir dos CSVs originais, use o schema em [`sql/schema.sql`](sql/schema.sql).
 
